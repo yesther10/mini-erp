@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     appName: {
         type: String,
@@ -13,9 +15,9 @@ const foundationItems = [
 ];
 
 const nextSteps = [
+    'Manage the first customer module slice in the backoffice',
     'Start Vite in watch mode to iterate on the UI',
-    'Add the first ERP business module on top of this foundation',
-    'Expand the ERP with additional operational modules after the first validated slice',
+    'Expand the ERP with additional operational modules on top of this foundation',
 ];
 </script>
 
@@ -39,6 +41,12 @@ const nextSteps = [
                     <span class="rounded-full border border-violet-400/30 bg-violet-400/10 px-4 py-2">Inertia</span>
                     <span class="rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2">Docker</span>
                     <span class="rounded-full border border-rose-400/30 bg-rose-400/10 px-4 py-2">MySQL</span>
+                </div>
+
+                <div>
+                    <Link href="/customers" class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500">
+                        Open customers backoffice
+                    </Link>
                 </div>
             </div>
 
