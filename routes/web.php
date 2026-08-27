@@ -4,9 +4,10 @@ use App\Http\Controllers\AssetAssignmentController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Dashboard')->name('dashboard');
+Route::get('/', DashboardController::class)->name('dashboard');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');

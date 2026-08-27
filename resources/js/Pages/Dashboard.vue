@@ -1,85 +1,72 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
-
 defineProps({
-    appName: {
-        type: String,
-        default: 'Mini ERP',
+    stats: {
+        type: Object,
+        required: true,
+    },
+    customers: {
+        type: Array,
+        required: true,
     },
 });
-
-const foundationItems = [
-    'Laravel 13 application scaffolded for the ERP prototype',
-    'Vue 3 frontend mounted through Inertia without a separate SPA API layer',
-    'Docker Compose workflow prepared for PHP, Nginx, MySQL, Composer, and NPM',
-];
-
-const nextSteps = [
-    'Manage the first customer module slice in the backoffice',
-    'Start Vite in watch mode to iterate on the UI',
-    'Expand the ERP with additional operational modules on top of this foundation',
-];
 </script>
 
 <template>
-    <main class="mx-auto flex min-h-screen max-w-6xl flex-col gap-12 px-6 py-12 lg:px-8">
-        <section class="grid gap-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/30 lg:grid-cols-[1.4fr_0.8fr]">
-            <div class="space-y-6">
-                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-300">ERP Prototype Foundation</p>
-                <div class="space-y-4">
-                    <h1 class="text-4xl font-semibold tracking-tight text-white lg:text-5xl">
-                        {{ appName }} is running on Laravel, Vue 3, and Inertia.
-                    </h1>
-                    <p class="max-w-2xl text-base leading-7 text-slate-300">
-                        This landing page proves the backend, frontend, and server-driven SPA bridge are wired together in a single pragmatic MVP setup.
-                    </p>
-                </div>
+    <div class="space-y-8">
+        <header>
+            <h1 class="text-3xl font-semibold text-white">Dashboard</h1>
+            <p class="mt-2 text-sm text-slate-400">Overview of your ERP at a glance.</p>
+        </header>
 
-                <div class="flex flex-wrap gap-3 text-sm text-slate-200">
-                    <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2">Laravel</span>
-                    <span class="rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-2">Vue 3</span>
-                    <span class="rounded-full border border-violet-400/30 bg-violet-400/10 px-4 py-2">Inertia</span>
-                    <span class="rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2">Docker</span>
-                    <span class="rounded-full border border-rose-400/30 bg-rose-400/10 px-4 py-2">MySQL</span>
-                </div>
+        <!-- Stat cards -->
+        <div class="grid gap-6 sm:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <p class="text-sm font-medium text-slate-400">Total Customers</p>
+                <p class="mt-2 text-3xl font-semibold text-white">{{ stats.totalCustomers }}</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <p class="text-sm font-medium text-slate-400">Total Assets</p>
+                <p class="mt-2 text-3xl font-semibold text-white">{{ stats.totalAssets }}</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+                <p class="text-sm font-medium text-slate-400">Assigned Assets</p>
+                <p class="mt-2 text-3xl font-semibold text-white">{{ stats.totalAssigned }}</p>
+            </div>
+        </div>
 
-                <div>
-                    <Link href="/customers" class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500">
-                        Open customers backoffice
-                    </Link>
-                </div>
+        <!-- Customer-asset summary table -->
+        <section class="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 class="text-lg font-semibold text-white">Customer Asset Summary</h2>
+
+            <div v-if="customers.length === 0" class="mt-4 text-sm text-slate-400">
+                No customers registered yet.
             </div>
 
-            <aside class="rounded-2xl border border-white/10 bg-slate-900/80 p-6">
-                <p class="text-sm font-medium text-slate-400">Suggested local commands</p>
-                <div class="mt-4 space-y-3 font-mono text-sm text-slate-200">
-                    <div class="rounded-xl bg-slate-950 px-4 py-3">docker compose up -d mysql app nginx</div>
-                    <div class="rounded-xl bg-slate-950 px-4 py-3">docker compose run --rm app php artisan migrate</div>
-                    <div class="rounded-xl bg-slate-950 px-4 py-3">docker compose run --rm --service-ports app npm run dev</div>
-                </div>
-            </aside>
+            <div v-else class="mt-4 overflow-x-auto">
+                <table class="min-w-full divide-y divide-white/10 text-sm">
+                    <thead>
+                        <tr class="text-left text-sm font-medium text-slate-400">
+                            <th class="pb-3 pr-4">Customer</th>
+                            <th class="pb-3 pr-4">Location</th>
+                            <th class="pb-3">Assets</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-slate-300">
+                        <tr v-for="customer in customers" :key="customer.id">
+                            <td class="py-4 pr-4 font-medium text-white">{{ customer.legal_name }}</td>
+                            <td class="py-4 pr-4">{{ customer.city }}/{{ customer.state }}</td>
+                            <td class="py-4">
+                                <span v-if="customer.assets.length === 0" class="text-slate-500">No assets assigned</span>
+                                <ul v-else class="space-y-1">
+                                    <li v-for="(asset, idx) in customer.assets" :key="idx">
+                                        {{ asset.internal_code }} — {{ asset.brand }} {{ asset.model }}
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
-
-        <section class="grid gap-6 lg:grid-cols-2">
-            <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
-                <h2 class="text-xl font-semibold text-white">What is already in place</h2>
-                <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-                    <li v-for="item in foundationItems" :key="item" class="flex gap-3">
-                        <span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                        <span>{{ item }}</span>
-                    </li>
-                </ul>
-            </article>
-
-            <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
-                <h2 class="text-xl font-semibold text-white">Immediate next steps</h2>
-                <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-                    <li v-for="item in nextSteps" :key="item" class="flex gap-3">
-                        <span class="mt-1 h-2.5 w-2.5 rounded-full bg-blue-400"></span>
-                        <span>{{ item }}</span>
-                    </li>
-                </ul>
-            </article>
-        </section>
-    </main>
+    </div>
 </template>
