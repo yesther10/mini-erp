@@ -28,7 +28,7 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
 </script>
 
 <template>
-    <main class="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-10 lg:px-8">
+    <div class="space-y-6">
         <header class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Backoffice</p>
@@ -77,5 +77,5 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
                 </button>
             </div>
         </form>
-    </main>
+    </div>
 </template>
