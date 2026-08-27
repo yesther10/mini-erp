@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
@@ -36,6 +37,11 @@ class Customer extends Model
         'primary_contact_email',
         'primary_contact_phone',
     ];
+
+    public function assetAssignments(): HasMany
+    {
+        return $this->hasMany(AssetAssignment::class);
+    }
 
     public function scopeSearch(Builder $query, string $search): Builder
     {
