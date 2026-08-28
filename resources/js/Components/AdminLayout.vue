@@ -6,22 +6,18 @@ const page = usePage();
 const currentUrl = computed(() => page.url);
 
 const navigation = [
-    { label: 'Dashboard', href: '/' },
-    { label: 'Customers', href: '/customers' },
-    { label: 'Assets', href: '/assets' },
+    { label: 'Dashboard', href: '/admin/dashboard' },
+    { label: 'Customers', href: '/admin/customers' },
+    { label: 'Assets', href: '/admin/assets' },
 ];
 
 function isActive(href) {
-    if (href === '/') {
-        return currentUrl.value === '/';
-    }
-
     return currentUrl.value.startsWith(href);
 }
 </script>
 
 <template>
-    <div class="flex min-h-screen bg-slate-950 text-slate-200">
+    <div data-testid="admin-layout" class="flex min-h-screen bg-slate-950 text-slate-200">
         <!-- Sidebar -->
         <aside class="flex w-64 flex-col border-r border-white/10 bg-slate-900/50">
             <div class="flex items-center gap-3 border-b border-white/10 px-6 py-5">

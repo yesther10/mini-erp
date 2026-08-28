@@ -22,43 +22,77 @@ class BackofficeAuthenticationTest extends TestCase
             );
     }
 
-    public function test_authenticated_user_is_redirected_from_login_to_customers_index(): void
+    public function test_authenticated_user_is_redirected_from_login_to_dashboard(): void
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get(route('login'));
 
-        $response->assertRedirectToRoute('customers.index');
+        $response->assertRedirect('/admin/dashboard');
     }
 
-    public function test_guest_is_redirected_from_customers_index_to_login(): void
+    public function test_guest_is_redirected_from_admin_dashboard_to_login(): void
     {
-        $this->assertGuestRedirectsToLogin('customers.index');
+        $response = $this->get('/admin/dashboard');
+
+        $response->assertRedirectToRoute('login');
     }
 
-    public function test_guest_is_redirected_from_assets_index_to_login(): void
+    public function test_guest_is_redirected_from_admin_customers_to_login(): void
+    {
+        $response = $this->get('/admin/customers');
+
+        $response->assertRedirectToRoute('login');
+    }
+
+    public function test_guest_is_redirected_from_admin_assets_to_login(): void
+    {
+        $response = $this->get('/admin/assets');
+
+        $response->assertRedirectToRoute('login');
+    }
+
+    public function test_guest_is_redirected_from_admin_asset_assignment_to_login(): void
     {
         $asset = Asset::factory()->create();
 
-        $this->assertGuestRedirectsToLogin('assets.index');
-        $this->assertGuestRedirectsToLogin('assets.assignments.create', [$asset]);
+        $response = $this->get("/admin/assets/{$asset->id}/assign");
+
+        $response->assertRedirectToRoute('login');
     }
 
-    public function test_valid_credentials_redirect_to_the_intended_backoffice_page(): void
+    public function test_valid_credentials_redirect_to_the_intended_admin_page(): void
     {
         $user = User::factory()->create([
             'email' => 'manager@example.com',
             'password' => 'password',
         ]);
 
-        $this->get(route('customers.index'));
+        $this->get('/admin/customers');
 
         $response = $this->post(route('login'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $response->assertRedirectToRoute('customers.index');
+        $response->assertRedirect('/admin/customers');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_valid_credentials_fall_back_to_dashboard_when_no_intended_route_exists(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'manager@example.com',
+            'password' => 'password',
+        ]);
+
+        $response = $this->post(route('login'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/admin/dashboard');
 
         $this->assertAuthenticatedAs($user);
     }
@@ -100,7 +134,7 @@ class BackofficeAuthenticationTest extends TestCase
 
         $this->actingAs($user)->post(route('logout'));
 
-        $response = $this->get(route('customers.index'));
+        $response = $this->get('/admin/customers');
 
         $response->assertRedirectToRoute('login');
         $this->assertGuest();
@@ -122,15 +156,5 @@ class BackofficeAuthenticationTest extends TestCase
                 ->where('auth.user.name', $user->name)
                 ->where('auth.user.email', $user->email)
             );
-    }
-
-    /**
-     * @param  array<int, mixed>|array<string, mixed>  $parameters
-     */
-    private function assertGuestRedirectsToLogin(string $route, array $parameters = []): void
-    {
-        $response = $this->get(route($route, $parameters));
-
-        $response->assertRedirectToRoute('login');
     }
 }

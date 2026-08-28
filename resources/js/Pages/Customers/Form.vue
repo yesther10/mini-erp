@@ -34,6 +34,7 @@ const form = useForm({
     primary_contact_email: props.customer.primary_contact_email,
     primary_contact_phone: props.customer.primary_contact_phone,
 });
+const customersPath = '/admin/customers';
 
 const submit = () => {
     form.submit(props.method, props.submitUrl);
@@ -51,7 +52,7 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
                 <p class="mt-2 text-sm text-slate-600">Capture the legal entity, address, and primary contact in one place.</p>
             </div>
 
-            <Link href="/customers" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
+            <Link :href="customersPath" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
                 Back to list
             </Link>
         </header>

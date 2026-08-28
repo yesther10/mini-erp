@@ -12,7 +12,7 @@ createInertiaApp({
     resolve: (name) =>
         resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')).then(
             (page) => {
-                if (!name.startsWith('Auth/')) {
+                if (!name.startsWith('Auth/') && !name.startsWith('Public/')) {
                     page.default.layout = AdminLayout;
                 }
 

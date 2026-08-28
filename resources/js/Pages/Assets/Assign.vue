@@ -21,8 +21,9 @@ const form = useForm({
     allocated_at: props.assignment.allocated_at,
     note: props.assignment.note,
 });
+const assetsPath = '/admin/assets';
 
-const submit = () => form.post(`/assets/${props.asset.id}/assign`);
+const submit = () => form.post(`${assetsPath}/${props.asset.id}/assign`);
 
 const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none ring-0 transition focus:border-blue-500';
 </script>
@@ -36,7 +37,7 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
                 <p class="mt-2 text-sm text-slate-600">Allocate {{ asset.internal_code }} to a customer.</p>
             </div>
 
-            <Link href="/assets" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
+            <Link :href="assetsPath" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
                 Back to list
             </Link>
         </header>

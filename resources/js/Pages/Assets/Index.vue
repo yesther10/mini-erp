@@ -17,11 +17,12 @@ const props = defineProps({
 });
 
 const flash = usePage().props.flash ?? {};
+const assetsPath = '/admin/assets';
 
 const submitSearch = (event) => {
     const formData = new FormData(event.target);
 
-    router.get('/assets', {
+    router.get(assetsPath, {
         search: formData.get('search')?.toString().trim() ?? '',
         category: formData.get('category')?.toString() ?? '',
     }, {
@@ -43,7 +44,7 @@ const formatLabel = (value) => value.replaceAll('_', ' ').replace(/\b\w/g, (char
                 <p class="mt-2 text-sm text-slate-600">Register assets and allocate them to customers from one internal catalog.</p>
             </div>
 
-            <Link href="/assets/create" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+            <Link :href="`${assetsPath}/create`" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
                 New asset
             </Link>
         </header>
@@ -101,7 +102,7 @@ const formatLabel = (value) => value.replaceAll('_', ' ').replace(/\b\w/g, (char
                             <td class="py-4 pr-4">{{ formatLabel(asset.status) }}</td>
                             <td class="py-4 pr-4">{{ asset.customer ?? '—' }}</td>
                             <td class="py-4 text-right">
-                                <Link v-if="asset.can_assign" :href="`/assets/${asset.id}/assign`" class="font-semibold text-blue-600 hover:text-blue-500">
+                                <Link v-if="asset.can_assign" :href="`${assetsPath}/${asset.id}/assign`" class="font-semibold text-blue-600 hover:text-blue-500">
                                     Assign
                                 </Link>
                             </td>

@@ -23,6 +23,8 @@ class DashboardControllerTest extends TestCase
 
     public function test_dashboard_returns_stats_and_customers(): void
     {
+        $this->assertSame('/admin/dashboard', parse_url(route('dashboard'), PHP_URL_PATH));
+
         $customer1 = Customer::factory()->create(['legal_name' => 'ACME LTDA']);
         $customer2 = Customer::factory()->create(['legal_name' => 'BETA LTDA']);
 
@@ -39,7 +41,7 @@ class DashboardControllerTest extends TestCase
             'customer_id' => $customer1->id,
         ]);
 
-        $response = $this->get(route('dashboard'));
+        $response = $this->get('/admin/dashboard');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -57,7 +59,7 @@ class DashboardControllerTest extends TestCase
     {
         Customer::factory()->create(['legal_name' => 'EMPTY CORP']);
 
-        $response = $this->get(route('dashboard'));
+        $response = $this->get('/admin/dashboard');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -73,7 +75,7 @@ class DashboardControllerTest extends TestCase
 
     public function test_dashboard_with_no_data(): void
     {
-        $response = $this->get(route('dashboard'));
+        $response = $this->get('/admin/dashboard');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -91,7 +93,7 @@ class DashboardControllerTest extends TestCase
         Customer::factory()->create(['legal_name' => 'ALPHA LTDA']);
         Customer::factory()->create(['legal_name' => 'MU LTDA']);
 
-        $response = $this->get(route('dashboard'));
+        $response = $this->get('/admin/dashboard');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
