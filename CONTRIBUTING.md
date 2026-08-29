@@ -22,6 +22,12 @@ Use this lightweight branch workflow to keep changes predictable.
 - Promote `develop` to `main` only through a dedicated release pull request.
 - Use that release pull request when the current state of `develop` is ready to become the stable version.
 
+## Issue tracking
+
+- Pull requests merged into `develop` do not automatically close linked issues because `develop` is not the default branch.
+- Close those issues manually after the PR is merged into `develop` and the work is confirmed.
+- Pull requests merged into `main` can auto-close linked issues when they use the standard closing keywords.
+
 ## Hotfixes
 
 1. Create `hotfix/<short-name>` from `main`.
