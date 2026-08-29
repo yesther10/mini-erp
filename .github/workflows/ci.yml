@@ -117,6 +117,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Verify services before Playwright
+        run: |
+          docker compose ps
+          curl -sf http://127.0.0.1:8000/login > /dev/null && echo "nginx OK" || echo "nginx FAIL"
+
       - name: Run Playwright tests
         run: npx playwright test
 
