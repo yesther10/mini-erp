@@ -13,12 +13,13 @@ const props = defineProps({
 });
 
 const flash = usePage().props.flash ?? {};
+const customersPath = '/admin/customers';
 
 const submitSearch = (event) => {
     const formData = new FormData(event.target);
     const search = formData.get('search')?.toString().trim() ?? '';
 
-    router.get('/customers', { search }, {
+    router.get(customersPath, { search }, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
@@ -35,7 +36,7 @@ const submitSearch = (event) => {
                 <p class="mt-2 text-sm text-slate-600">Manage legal entities, commercial addresses, and primary contacts.</p>
             </div>
 
-            <Link href="/customers/create" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+            <Link :href="`${customersPath}/create`" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
                 New customer
             </Link>
         </header>
@@ -79,7 +80,7 @@ const submitSearch = (event) => {
                                 <div class="text-xs text-slate-500">{{ customer.primary_contact_email }}</div>
                             </td>
                             <td class="py-4 text-right">
-                                <Link :href="`/customers/${customer.id}/edit`" class="font-semibold text-blue-600 hover:text-blue-500">
+                                <Link :href="`${customersPath}/${customer.id}/edit`" class="font-semibold text-blue-600 hover:text-blue-500">
                                     Edit
                                 </Link>
                             </td>

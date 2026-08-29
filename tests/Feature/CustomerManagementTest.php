@@ -22,7 +22,7 @@ class CustomerManagementTest extends TestCase
     {
         $response = $this->post(route('customers.store'), $this->validPayload());
 
-        $response->assertRedirect(route('customers.index'));
+        $response->assertRedirect('/admin/customers');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('customers', [
@@ -42,9 +42,9 @@ class CustomerManagementTest extends TestCase
             'zip_code' => '1234',
         ]);
 
-        $response = $this->from(route('customers.create'))->post(route('customers.store'), $payload);
+        $response = $this->from('/admin/customers/create')->post(route('customers.store'), $payload);
 
-        $response->assertRedirect(route('customers.create'));
+        $response->assertRedirect('/admin/customers/create');
         $response->assertSessionHasErrors([
             'cnpj',
             'primary_contact_email',
@@ -59,9 +59,9 @@ class CustomerManagementTest extends TestCase
             'cnpj' => '04252011000110',
         ]);
 
-        $response = $this->from(route('customers.create'))->post(route('customers.store'), $this->validPayload());
+        $response = $this->from('/admin/customers/create')->post(route('customers.store'), $this->validPayload());
 
-        $response->assertRedirect(route('customers.create'));
+        $response->assertRedirect('/admin/customers/create');
         $response->assertSessionHasErrors(['cnpj']);
     }
 
@@ -82,7 +82,7 @@ class CustomerManagementTest extends TestCase
             'cnpj' => '98765432000199',
         ]);
 
-        $this->get(route('customers.index', ['search' => 'ACME']))
+        $this->get('/admin/customers?search=ACME')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Customers/Index', false)
@@ -91,7 +91,7 @@ class CustomerManagementTest extends TestCase
                 ->where('customers.data.0.id', $matchingByName->id)
             );
 
-        $this->get(route('customers.index', ['search' => '11.222.333/0001-81']))
+        $this->get('/admin/customers?search=11.222.333/0001-81')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Customers/Index', false)
@@ -118,7 +118,7 @@ class CustomerManagementTest extends TestCase
             'cnpj' => '98765432000199',
         ]);
 
-        $this->get(route('customers.index', ['search' => '%']))
+        $this->get('/admin/customers?search=%25')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Customers/Index', false)
@@ -127,7 +127,7 @@ class CustomerManagementTest extends TestCase
                 ->where('customers.data.0.id', $matchingPercent->id)
             );
 
-        $this->get(route('customers.index', ['search' => '_']))
+        $this->get('/admin/customers?search=_')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Customers/Index', false)
@@ -153,7 +153,7 @@ class CustomerManagementTest extends TestCase
             'primary_contact_email' => 'maria@acme.test',
         ]));
 
-        $response->assertRedirect(route('customers.index'));
+        $response->assertRedirect('/admin/customers');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('customers', [

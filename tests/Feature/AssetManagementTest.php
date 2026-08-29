@@ -23,7 +23,7 @@ class AssetManagementTest extends TestCase
     {
         $response = $this->post(route('assets.store'), $this->validAssetPayload());
 
-        $response->assertRedirect(route('assets.index'));
+        $response->assertRedirect('/admin/assets');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('assets', [
@@ -42,11 +42,11 @@ class AssetManagementTest extends TestCase
             'internal_code' => 'AST-001',
         ]);
 
-        $response = $this->from(route('assets.create'))->post(route('assets.store'), $this->validAssetPayload([
+        $response = $this->from('/admin/assets/create')->post(route('assets.store'), $this->validAssetPayload([
             'category' => 'invalid-category',
         ]));
 
-        $response->assertRedirect(route('assets.create'));
+        $response->assertRedirect('/admin/assets/create');
         $response->assertSessionHasErrors(['internal_code', 'category']);
     }
 
@@ -56,7 +56,7 @@ class AssetManagementTest extends TestCase
             'status' => 'retired',
         ]));
 
-        $response->assertRedirect(route('assets.index'));
+        $response->assertRedirect('/admin/assets');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('assets', [
@@ -82,7 +82,7 @@ class AssetManagementTest extends TestCase
             'category' => 'printer',
         ]);
 
-        $this->get(route('assets.index', ['search' => 'ACME']))
+        $this->get('/admin/assets?search=ACME')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Assets/Index', false)
@@ -91,7 +91,7 @@ class AssetManagementTest extends TestCase
                 ->where('assets.0.id', $matchingByCode->id)
             );
 
-        $this->get(route('assets.index', ['category' => 'desktop']))
+        $this->get('/admin/assets?category=desktop')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Assets/Index', false)
@@ -109,7 +109,7 @@ class AssetManagementTest extends TestCase
         Asset::factory()->create(['internal_code' => 'AST-003']);
         Asset::factory()->create(['internal_code' => 'ASTX004']);
 
-        $this->get(route('assets.index', ['search' => '%']))
+        $this->get('/admin/assets?search=%25')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Assets/Index', false)
@@ -118,7 +118,7 @@ class AssetManagementTest extends TestCase
                 ->where('assets.0.id', $percentMatch->id)
             );
 
-        $this->get(route('assets.index', ['search' => '_']))
+        $this->get('/admin/assets?search=_')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Assets/Index', false)
@@ -141,7 +141,7 @@ class AssetManagementTest extends TestCase
             'note' => 'Installed on-site',
         ]);
 
-        $response->assertRedirect(route('assets.index'));
+        $response->assertRedirect('/admin/assets');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('asset_assignments', [
@@ -165,13 +165,13 @@ class AssetManagementTest extends TestCase
         foreach (['maintenance', 'retired'] as $status) {
             $asset = Asset::factory()->create(['status' => $status]);
 
-            $response = $this->from(route('assets.assignments.create', $asset))->post(route('assets.assignments.store', $asset), [
+            $response = $this->from("/admin/assets/{$asset->id}/assign")->post(route('assets.assignments.store', $asset), [
                 'customer_id' => $customer->id,
                 'allocated_at' => '2026-08-26',
                 'note' => null,
             ]);
 
-            $response->assertRedirect(route('assets.assignments.create', $asset));
+            $response->assertRedirect("/admin/assets/{$asset->id}/assign");
             $response->assertSessionHasErrors(['asset']);
 
             $this->assertDatabaseMissing('asset_assignments', [
@@ -199,8 +199,8 @@ class AssetManagementTest extends TestCase
         ];
 
         foreach ($assets as $asset) {
-            $this->get(route('assets.assignments.create', $asset))
-                ->assertRedirect(route('assets.index'))
+            $this->get("/admin/assets/{$asset->id}/assign")
+                ->assertRedirect('/admin/assets')
                 ->assertSessionHas('error', 'Only available and unassigned assets can be assigned.');
         }
     }
@@ -219,13 +219,13 @@ class AssetManagementTest extends TestCase
             'note' => 'Already allocated',
         ]);
 
-        $response = $this->from(route('assets.assignments.create', $asset))->post(route('assets.assignments.store', $asset), [
+        $response = $this->from("/admin/assets/{$asset->id}/assign")->post(route('assets.assignments.store', $asset), [
             'customer_id' => $secondCustomer->id,
             'allocated_at' => '2026-08-26',
             'note' => 'Second attempt',
         ]);
 
-        $response->assertRedirect(route('assets.assignments.create', $asset));
+        $response->assertRedirect("/admin/assets/{$asset->id}/assign");
         $response->assertSessionHasErrors(['asset']);
 
         $this->assertDatabaseCount('asset_assignments', 1);

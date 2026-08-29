@@ -67,3 +67,64 @@ jobs:
 
       - name: Run test suite
         run: php artisan test --compact
+
+  playwright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Build and start containers
+        run: docker compose up -d --build
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for MySQL..."
+          until docker compose exec -T mysql mysqladmin ping -h 127.0.0.1 --silent 2>/dev/null; do
+            sleep 2
+          done
+          echo "MySQL is ready"
+
+          echo "Waiting for nginx..."
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8000/login > /dev/null 2>&1; then
+              echo "nginx is ready"
+              break
+            fi
+            echo "waiting for nginx... ($i/30)"
+            sleep 2
+          done
+
+      - name: Bootstrap application
+        run: |
+          docker compose exec -T -u root app composer install --no-interaction --no-progress --prefer-dist
+          docker compose exec -T -u root app php artisan key:generate --force
+          docker compose exec -T -u root app php artisan migrate --force
+          docker compose exec -T -u root app php artisan db:seed --force
+          docker compose exec -T -u root app npm ci
+          docker compose exec -T -u root app npm run build
+          docker compose exec -T -u root app chown -R app:app /var/www/html/vendor /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test-results/
+          retention-days: 7
