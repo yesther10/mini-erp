@@ -13,12 +13,13 @@ const props = defineProps({
 });
 
 const flash = usePage().props.flash ?? {};
+const customersPath = '/admin/customers';
 
 const submitSearch = (event) => {
     const formData = new FormData(event.target);
     const search = formData.get('search')?.toString().trim() ?? '';
 
-    router.get('/customers', { search }, {
+    router.get(customersPath, { search }, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
@@ -27,7 +28,7 @@ const submitSearch = (event) => {
 </script>
 
 <template>
-    <main class="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10 lg:px-8">
+    <div class="space-y-6">
         <header class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Backoffice</p>
@@ -35,7 +36,7 @@ const submitSearch = (event) => {
                 <p class="mt-2 text-sm text-slate-600">Manage legal entities, commercial addresses, and primary contacts.</p>
             </div>
 
-            <Link href="/customers/create" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+            <Link :href="`${customersPath}/create`" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
                 New customer
             </Link>
         </header>
@@ -79,7 +80,7 @@ const submitSearch = (event) => {
                                 <div class="text-xs text-slate-500">{{ customer.primary_contact_email }}</div>
                             </td>
                             <td class="py-4 text-right">
-                                <Link :href="`/customers/${customer.id}/edit`" class="font-semibold text-blue-600 hover:text-blue-500">
+                                <Link :href="`${customersPath}/${customer.id}/edit`" class="font-semibold text-blue-600 hover:text-blue-500">
                                     Edit
                                 </Link>
                             </td>
@@ -93,5 +94,5 @@ const submitSearch = (event) => {
                 </table>
             </div>
         </section>
-    </main>
+    </div>
 </template>

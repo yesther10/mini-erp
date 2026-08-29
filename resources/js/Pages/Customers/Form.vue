@@ -34,6 +34,7 @@ const form = useForm({
     primary_contact_email: props.customer.primary_contact_email,
     primary_contact_phone: props.customer.primary_contact_phone,
 });
+const customersPath = '/admin/customers';
 
 const submit = () => {
     form.submit(props.method, props.submitUrl);
@@ -43,7 +44,7 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
 </script>
 
 <template>
-    <main class="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-10 lg:px-8">
+    <div class="space-y-6">
         <header class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Backoffice</p>
@@ -51,7 +52,7 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
                 <p class="mt-2 text-sm text-slate-600">Capture the legal entity, address, and primary contact in one place.</p>
             </div>
 
-            <Link href="/customers" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
+            <Link :href="customersPath" class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900">
                 Back to list
             </Link>
         </header>
@@ -142,5 +143,5 @@ const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 tex
                 </button>
             </div>
         </form>
-    </main>
+    </div>
 </template>

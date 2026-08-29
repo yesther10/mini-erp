@@ -1,0 +1,65 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Laravel 13, PHP 8.4 target, Inertia.js 3, Vue 3, Tailwind CSS 4, Vite 8.
+  Runtime: Docker Compose app + nginx + MySQL 8.4; local host PHP 8.2 is below the project requirement.
+  Architecture: Thin controllers, Form Requests, action classes, Eloquent models/enums, Inertia pages.
+  Testing: PHPUnit 12 with Laravel feature and unit suites; feature tests use RefreshDatabase with sqlite in-memory.
+  Quality: Pint configured; no dedicated static analyzer or JS test runner detected.
+
+strict_tdd: true
+
+testing:
+  detected_at: 2026-08-27
+  runner:
+    framework: PHPUnit 12 via Laravel test runner
+    command: docker compose run --rm app php artisan test --compact
+  layers:
+    unit:
+      available: true
+      tool: PHPUnit
+    integration:
+      available: true
+      tool: Laravel Feature tests (HTTP + RefreshDatabase)
+    e2e:
+      available: false
+      tool: "—"
+  coverage:
+    available: false
+    command: "—"
+  quality:
+    linter:
+      available: true
+      command: docker compose run --rm app vendor/bin/pint --test
+    type_checker:
+      available: false
+      command: "—"
+    formatter:
+      available: true
+      command: docker compose run --rm app vendor/bin/pint --dirty --format agent
+
+rules:
+  proposal:
+    - Keep proposals aligned to the current Laravel + Inertia MVP slices and call out Docker/runtime assumptions.
+    - Include rollback notes when a change touches persisted data or route contracts.
+  specs:
+    - Use Given/When/Then scenarios and RFC 2119 keywords.
+    - Preserve English technical artifacts even if conversation language changes.
+  design:
+    - Reuse the existing thin-controller plus action-class pattern unless a defect forces deviation.
+    - Call out DB/query implications for customer, asset, and assignment flows.
+  tasks:
+    - Keep tasks small enough for one reviewable slice.
+    - Include test-first steps before implementation steps.
+  apply:
+    guidelines:
+      - Follow existing Form Request, Action, enum, and Inertia page conventions.
+      - Prefer Docker commands for PHP/Artisan execution in this environment.
+    tdd: true
+    test_command: docker compose run --rm app php artisan test --compact
+  verify:
+    test_command: docker compose run --rm app php artisan test --compact
+    build_command: docker compose run --rm app npm run build
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas or changes that alter public slice behavior.
