@@ -107,6 +107,7 @@ jobs:
           docker compose exec -T -u root app php artisan db:seed --force
           docker compose exec -T -u root app npm ci
           docker compose exec -T -u root app npm run build
+          docker compose exec -T -u root app chown -R app:app /var/www/html/vendor /var/www/html/public/build
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -116,11 +117,6 @@ jobs:
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-
-      - name: Verify services before Playwright
-        run: |
-          docker compose ps
-          curl -sf http://127.0.0.1:8000/login > /dev/null && echo "nginx OK" || echo "nginx FAIL"
 
       - name: Run Playwright tests
         run: npx playwright test
