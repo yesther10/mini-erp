@@ -2,6 +2,10 @@
 
 Initial MVP foundation for a small ERP prototype built with Laravel, Vue 3, Inertia, MySQL, and Docker.
 
+## Contributing
+
+For the repository branch workflow and pull request path, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Stack
 
 - Laravel 13
