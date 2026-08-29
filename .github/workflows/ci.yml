@@ -118,12 +118,6 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Diagnose app after bootstrap
-        run: |
-          curl -v http://127.0.0.1:8000/login 2>&1 | head -30
-          docker compose ps
-          docker compose logs --tail 20 app
-
       - name: Run Playwright tests
         run: npx playwright test
 

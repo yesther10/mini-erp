@@ -58,10 +58,10 @@ export default async function globalSetup() {
         await rm(hotBackupFile);
     }
 
-    run('npx', ['playwright', 'install', 'chromium']);
-
     const isCI = !!process.env.CI;
+
     if (!isCI) {
+        run('npx', ['playwright', 'install', 'chromium']);
         run('docker', ['compose', 'up', '-d', 'nginx']);
         run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'migrate', '--force']);
         run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'db:seed', '--force']);
