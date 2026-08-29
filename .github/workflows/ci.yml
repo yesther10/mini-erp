@@ -107,7 +107,7 @@ jobs:
           docker compose exec -T -u root app php artisan db:seed --force
           docker compose exec -T -u root app npm ci
           docker compose exec -T -u root app npm run build
-          docker compose exec -T -u root app chown -R app:app /var/www/html
+          docker compose exec -T -u root app chown -R app:app /var/www/html/vendor /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
