@@ -9,6 +9,7 @@ const navigation = [
     { label: 'Dashboard', href: '/admin/dashboard' },
     { label: 'Customers', href: '/admin/customers' },
     { label: 'Assets', href: '/admin/assets' },
+    { label: 'Leads', href: '/admin/leads' },
 ];
 
 function isActive(href) {
