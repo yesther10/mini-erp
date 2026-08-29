@@ -59,10 +59,14 @@ export default async function globalSetup() {
     }
 
     run('npx', ['playwright', 'install', 'chromium']);
-    run('docker', ['compose', 'up', '-d', 'nginx']);
-    run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'migrate', '--force']);
-    run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'db:seed', '--force']);
-    run('docker', ['compose', 'run', '--rm', 'app', 'npm', 'run', 'build']);
+
+    const isCI = !!process.env.CI;
+    if (!isCI) {
+        run('docker', ['compose', 'up', '-d', 'nginx']);
+        run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'migrate', '--force']);
+        run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'db:seed', '--force']);
+        run('docker', ['compose', 'run', '--rm', 'app', 'npm', 'run', 'build']);
+    }
 
     await waitForApp();
 }
