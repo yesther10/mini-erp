@@ -31,6 +31,7 @@ function isActive(href) {
                     <li v-for="item in navigation" :key="item.href">
                         <Link
                             :href="item.href"
+                            :aria-current="isActive(item.href) ? 'page' : null"
                             :class="[
                                 'flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition',
                                 isActive(item.href)

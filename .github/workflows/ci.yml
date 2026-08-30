@@ -109,17 +109,10 @@ jobs:
           docker compose exec -T -u root app npm run build
           docker compose exec -T -u root app chown -R app:app /var/www/html/vendor /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run Playwright tests
-        run: npx playwright test
+      - name: Run Playwright tests in Docker
+        run: |
+          docker compose exec -T -u root app npx playwright install --with-deps chromium
+          docker compose exec -T -u root app npm run test:runtime
 
       - name: Upload Playwright report
         if: always()

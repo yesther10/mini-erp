@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite --host 0.0.0.0 --port 5173",
-        "test:runtime": "playwright test"
+        "test:runtime": "mkdir -p storage/framework/testing/tmp && TMPDIR=/var/www/html/storage/framework/testing/tmp PLAYWRIGHT_BROWSERS_PATH=0 playwright test"
     },
     "devDependencies": {
         "@playwright/test": "^1.62.1",

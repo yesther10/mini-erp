@@ -54,6 +54,19 @@ test('admin leads page mounts inside the admin layout', async ({ page }) => {
     await expect(page.getByRole('table')).toBeVisible();
 });
 
+test('admin leads navigation marks the leads entry as active on the leads page', async ({ page }) => {
+    await signIn(page);
+    await page.goto('/admin/customers');
+
+    await expect(page.getByRole('link', { name: 'Leads' })).not.toHaveAttribute('aria-current', 'page');
+
+    await page.getByRole('link', { name: 'Leads' }).click();
+
+    await expect(page).toHaveURL('/admin/leads');
+    await expect(page.getByRole('link', { name: 'Leads' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('link', { name: 'Customers' })).not.toHaveAttribute('aria-current', 'page');
+});
+
 test('admin customers page mounts inside the admin layout', async ({ page }) => {
     await signIn(page);
     await page.goto('/admin/customers');

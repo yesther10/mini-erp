@@ -1,18 +1,20 @@
-import { access, copyFile, mkdir, rm } from 'node:fs/promises';
+import { access, copyFile, mkdir, rm, writeFile } from 'node:fs/promises';
 import { constants as fsConstants } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const hotFile = path.join(root, 'public', 'hot');
 const backupDirectory = path.join(root, 'storage', 'framework', 'testing');
 const hotBackupFile = path.join(backupDirectory, 'playwright.hot');
+const runtimeServerPidFile = path.join(backupDirectory, 'playwright-runtime-server.pid');
 
 function run(command, args) {
     const result = spawnSync(command, args, {
         cwd: root,
+        env: process.env,
         stdio: 'inherit',
     });
 
@@ -28,6 +30,28 @@ async function fileExists(filePath) {
     } catch {
         return false;
     }
+}
+
+async function isRunningInContainer() {
+    return fileExists('/.dockerenv');
+}
+
+async function startRuntimeServer() {
+    await rm(runtimeServerPidFile, { force: true });
+
+    const server = spawn('php', ['artisan', 'serve', '--host=0.0.0.0', '--port=8000'], {
+        cwd: root,
+        env: process.env,
+        stdio: 'ignore',
+    });
+
+    server.unref();
+
+    if (typeof server.pid !== 'number') {
+        throw new Error('Failed to start the Laravel runtime server for Playwright.');
+    }
+
+    await writeFile(runtimeServerPidFile, `${server.pid}`);
 }
 
 async function waitForApp() {
@@ -59,13 +83,22 @@ export default async function globalSetup() {
     }
 
     const isCI = !!process.env.CI;
+    const runningInContainer = await isRunningInContainer();
 
     if (!isCI) {
         run('npx', ['playwright', 'install', 'chromium']);
-        run('docker', ['compose', 'up', '-d', 'nginx']);
-        run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'migrate', '--force']);
-        run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'db:seed', '--force']);
-        run('docker', ['compose', 'run', '--rm', 'app', 'npm', 'run', 'build']);
+
+        if (runningInContainer) {
+            run('php', ['artisan', 'migrate', '--force']);
+            run('php', ['artisan', 'db:seed', '--force']);
+            run('npm', ['run', 'build']);
+            await startRuntimeServer();
+        } else {
+            run('docker', ['compose', 'up', '-d', 'nginx']);
+            run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'migrate', '--force']);
+            run('docker', ['compose', 'run', '--rm', 'app', 'php', 'artisan', 'db:seed', '--force']);
+            run('docker', ['compose', 'run', '--rm', 'app', 'npm', 'run', 'build']);
+        }
     }
 
     await waitForApp();
