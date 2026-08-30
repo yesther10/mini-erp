@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AssetCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -12,12 +13,21 @@ class PublicLandingControllerTest extends TestCase
 
     public function test_guest_can_open_the_public_landing_page(): void
     {
+        $assetCategories = array_map(static fn (AssetCategory $category): array => [
+            'value' => $category->value,
+            'label' => str($category->value)->replace('_', ' ')->title()->toString(),
+        ], AssetCategory::cases());
+
         $response = $this->get('/');
 
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Public/Landing', false)
-                ->where('ctaUrl', '/admin/dashboard')
+                ->where('heroTitle', 'Request the right equipment for your team')
+                ->where('heroDescription', 'Share your equipment needs with our backoffice team and we will follow up with availability and next steps.')
+                ->where('quoteSubmitUrl', '/quote-requests')
+                ->where('backofficeUrl', '/login')
+                ->where('assetCategories', $assetCategories)
                 ->where('auth.user', null)
             );
     }
@@ -31,7 +41,9 @@ class PublicLandingControllerTest extends TestCase
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Public/Landing', false)
-                ->where('ctaUrl', '/admin/dashboard')
+                ->where('heroTitle', 'Request the right equipment for your team')
+                ->where('quoteSubmitUrl', '/quote-requests')
+                ->where('backofficeUrl', '/login')
                 ->where('auth.user.id', $user->id)
             );
     }

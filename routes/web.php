@@ -5,10 +5,12 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\PublicLandingController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', PublicLandingController::class);
+Route::get('/', PublicLandingController::class)->name('landing');
+Route::post('quote-requests', [LeadController::class, 'store'])->name('quote-requests.store');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -23,6 +25,7 @@ Route::middleware('auth')->group(function (): void {
 
         Route::resource('customers', CustomerController::class)->except(['show', 'destroy']);
         Route::resource('assets', AssetController::class)->only(['index', 'create', 'store']);
+        Route::get('leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('assets/{asset}/assign', [AssetAssignmentController::class, 'create'])->name('assets.assignments.create');
         Route::post('assets/{asset}/assign', [AssetAssignmentController::class, 'store'])->name('assets.assignments.store');
     });
