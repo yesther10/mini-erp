@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\AssetCategory;
+use App\Models\Lead;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,6 +52,64 @@ class LeadManagementTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('leads', 0);
+    }
+
+    public function test_authenticated_user_can_view_admin_leads_list_in_newest_first_order(): void
+    {
+        $user = User::factory()->create();
+
+        $older = Lead::factory()->create(['company_name' => 'Older Corp', 'created_at' => now()->subDays(2)]);
+        $newer = Lead::factory()->create(['company_name' => 'Newer Corp', 'created_at' => now()]);
+
+        $response = $this->actingAs($user)->get('/admin/leads');
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Leads/Index', false)
+                ->has('leads.data', 2)
+                ->where('leads.data.0.company_name', 'Newer Corp')
+                ->where('leads.data.1.company_name', 'Older Corp')
+            );
+    }
+
+    public function test_admin_leads_list_shows_submitted_request_details(): void
+    {
+        $user = User::factory()->create();
+
+        Lead::factory()->create([
+            'company_name' => 'ACME LTDA',
+            'contact_name' => 'Ana Silva',
+            'contact_email' => 'ana.silva@example.com',
+            'asset_category' => AssetCategory::Notebook->value,
+            'quantity' => 12,
+            'need_summary' => 'Need notebooks for onboarding.',
+        ]);
+
+        $response = $this->actingAs($user)->get('/admin/leads');
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Leads/Index', false)
+                ->where('leads.data.0.company_name', 'ACME LTDA')
+                ->where('leads.data.0.contact_name', 'Ana Silva')
+                ->where('leads.data.0.contact_email', 'ana.silva@example.com')
+                ->where('leads.data.0.asset_category', AssetCategory::Notebook->value)
+                ->where('leads.data.0.quantity', 12)
+                ->where('leads.data.0.need_summary', 'Need notebooks for onboarding.')
+            );
+    }
+
+    public function test_admin_leads_list_shows_empty_state_when_no_leads_exist(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/admin/leads');
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Leads/Index', false)
+                ->where('leads.data', [])
+            );
     }
 
     /**

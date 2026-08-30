@@ -17,12 +17,12 @@ test('landing renders without the admin layout', async ({ page }) => {
     await page.goto('/');
 
     await expect(
-        page.getByRole('heading', { name: 'Manage customers and assets from one admin workspace.' }),
+        page.getByRole('heading', { name: 'Request the right equipment for your team' }),
     ).toBeVisible();
     await expect(page.getByTestId('admin-layout')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Open admin dashboard' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Backoffice sign in' })).toHaveAttribute(
         'href',
-        '/admin/dashboard',
+        '/login',
     );
 });
 
@@ -33,6 +33,7 @@ test('shared admin and page links keep admin destinations', async ({ page }) => 
     await expect(page.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/admin/dashboard');
     await expect(page.getByRole('link', { name: 'Customers' })).toHaveAttribute('href', '/admin/customers');
     await expect(page.getByRole('link', { name: 'Assets' })).toHaveAttribute('href', '/admin/assets');
+    await expect(page.getByRole('link', { name: 'Leads' })).toHaveAttribute('href', '/admin/leads');
     await expect(page.getByRole('link', { name: 'New customer' })).toHaveAttribute(
         'href',
         '/admin/customers/create',
@@ -44,12 +45,30 @@ test('shared admin and page links keep admin destinations', async ({ page }) => 
     await expect(page.getByRole('link', { name: 'New asset' })).toHaveAttribute('href', '/admin/assets/create');
 });
 
+test('admin leads page mounts inside the admin layout', async ({ page }) => {
+    await signIn(page);
+    await page.goto('/admin/leads');
+
+    await expect(page.getByTestId('admin-layout')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Leads' })).toBeVisible();
+    await expect(page.getByRole('table')).toBeVisible();
+});
+
 test('admin customers page mounts inside the admin layout', async ({ page }) => {
     await signIn(page);
     await page.goto('/admin/customers');
 
     await expect(page.getByTestId('admin-layout')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Customers' })).toBeVisible();
+});
+
+test('public landing displays quote request form', async ({ page }) => {
+    await page.goto('/');
+
+    await expect(page.getByRole('heading', { name: 'Tell us what your team needs' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send quote request' })).toBeVisible();
+    await expect(page.getByLabel('Company name')).toBeVisible();
+    await expect(page.getByLabel('Contact email')).toBeVisible();
 });
 
 test('public and auth pages render without the admin layout', async ({ page }) => {
