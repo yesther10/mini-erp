@@ -61,6 +61,23 @@ class BackofficeAuthenticationTest extends TestCase
         $response->assertRedirectToRoute('login');
     }
 
+    public function test_guest_is_redirected_from_admin_leads_to_login(): void
+    {
+        $response = $this->get('/admin/leads');
+
+        $response->assertRedirectToRoute('login');
+    }
+
+    public function test_authenticated_user_can_access_admin_leads_without_role_checks(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/admin/leads');
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Leads/Index', false));
+    }
+
     public function test_valid_credentials_redirect_to_the_intended_admin_page(): void
     {
         $user = User::factory()->create([
